@@ -1,0 +1,21 @@
+{
+	"name": "uptimeify-dnsbl",
+	"version": "1.0.0",
+	"description": "Helper module to prepare DNSBL queries and parse results.",
+	"main": "dist/index.js",
+	"type": "module",
+	"exports": {
+		".": "./src/index.js"
+	},
+	"scripts": {
+		"test": "node test.js"
+	},
+	"keywords": [
+		"dnsbl",
+		"blacklist",
+		"spam",
+		"check"
+	],
+	"author": "Uptimeify",
+	"license": "MIT"
+}
