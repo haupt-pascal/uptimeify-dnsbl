@@ -21,10 +21,22 @@ import { performance } from "node:perf_hooks";
 async function checkIP(ip) {
 	console.log(`\n🔎 Checking IP: ${ip}`);
 
+	const lookupOptions = process.env.SPAMHAUS_DQS_KEY
+		? {
+			spamhaus: {
+				mode: "dqs",
+				dqsKey: process.env.SPAMHAUS_DQS_KEY,
+			},
+		}
+		: undefined;
+	console.log(
+		`   Spamhaus mode: ${lookupOptions ? "dqs" : "zen"}${lookupOptions ? " (via SPAMHAUS_DQS_KEY)" : ""}`,
+	);
+
 	try {
 		// 1. Get the list of all DNSBL domains to query for this IP
 		const startGetDomains = performance.now();
-		const domains = getLookupDomains(ip);
+		const domains = getLookupDomains(ip, lookupOptions);
 		const endGetDomains = performance.now();
 		console.log(
 			`   Preparing to query ${domains.length} blacklists... (took ${(endGetDomains - startGetDomains).toFixed(5)}ms)`,

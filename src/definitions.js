@@ -14,6 +14,29 @@ export const blacklists = {
 		name: "Spamhaus ZEN",
 		delistUrl: "https://check.spamhaus.org/",
 		mappings: {
+			"127.255.255.254":
+				"Query blocked by Spamhaus (rate limit / missing authorization / policy)",
+			"127.0.0.2": "Listed in SBL (Spamhaus Block List - Direct spam sources)",
+			"127.0.0.3":
+				"Listed in CSS (Combating Spam Syndicate - Compromised hosts)",
+			"127.0.0.4":
+				"Listed in XBL/PBL (Exploits/Policy Block List - Botnets, open proxies, dynamic IPs)",
+			"127.0.0.5":
+				"Listed in XBL/PBL (Exploits/Policy Block List - Botnets, open proxies, dynamic IPs)",
+			"127.0.0.6":
+				"Listed in XBL/PBL (Exploits/Policy Block List - Botnets, open proxies, dynamic IPs)",
+			"127.0.0.7":
+				"Listed in XBL/PBL (Exploits/Policy Block List - Botnets, open proxies, dynamic IPs)",
+			"127.0.0.10": "PBL - ISP Policy",
+			"127.0.0.11": "PBL - ISP Policy",
+		},
+	},
+	"zen.dq.spamhaus.net": {
+		name: "Spamhaus DQS (ZEN)",
+		delistUrl: "https://check.spamhaus.org/",
+		mappings: {
+			"127.255.255.254":
+				"Query blocked by Spamhaus (rate limit / missing authorization / policy)",
 			"127.0.0.2": "Listed in SBL (Spamhaus Block List - Direct spam sources)",
 			"127.0.0.3":
 				"Listed in CSS (Combating Spam Syndicate - Compromised hosts)",
@@ -43,15 +66,16 @@ export const blacklists = {
 			"127.0.0.2": "Listed in SpamCop",
 		},
 	},
-	"combined.mail.abusix.zone": {
-		name: "Abusix Mail Intelligence",
-		delistUrl: "https://abusix.com/lookup/",
-		mappings: {
-			"127.0.0.2": "Blacklisted (Generic)",
-			"127.0.0.3": "Blacklisted (External)",
-			"127.0.0.4": "Blacklisted (Dynamic/Policy)",
-		},
-	},
+	// Disabled as Abusix RBLs are now paid services
+	// "combined.mail.abusix.zone": {
+	//	name: "Abusix Mail Intelligence",
+	//	delistUrl: "https://abusix.com/lookup/",
+	//	mappings: {
+	//		"127.0.0.2": "Blacklisted (Generic)",
+	//		"127.0.0.3": "Blacklisted (External)",
+	//		"127.0.0.4": "Blacklisted (Dynamic/Policy)",
+	//	},
+	//},
 	"dnsbl.sorbs.net": {
 		name: "SORBS Aggregate",
 		delistUrl: "http://www.sorbs.net/lookup.shtml",
@@ -139,16 +163,19 @@ export const blacklists = {
 		name: "URIBL Black",
 		delistUrl: "https://lookup.uribl.com/",
 		mappings: {
+			"127.0.0.1": "Query blocked, possibly due to high volume",
 			"127.0.0.2": "Listed in URIBL Black",
+			"127.0.0.255": "Query blocked",
 		},
 	},
-	"dnsbl.madavi.de": {
-		name: "Madavi DNSBL",
-		delistUrl: "https://www.madavi.de/en/dnsbl.html",
-		mappings: {
-			"127.0.0.2": "Listed in Madavi DNSBL",
-		},
-	},
+	// Dead on arrival, not reliable
+	// "dnsbl.madavi.de": {
+	// 	name: "Madavi DNSBL",
+	// 	delistUrl: "https://www.madavi.de/en/dnsbl.html",
+	// 	mappings: {
+	// 		"127.0.0.2": "Listed in Madavi DNSBL",
+	// 	},
+	// },
 	"dnsbl.rv-soft.info": {
 		name: "RV-SOFT Technology DNSBL",
 		delistUrl: "http://dnsbl.rv-soft.info",
@@ -229,6 +256,17 @@ export const blacklists = {
 		name: "Spamhaus SBL",
 		delistUrl: "https://check.spamhaus.org/",
 		mappings: {
+			"127.255.255.254":
+				"Query blocked by Spamhaus (rate limit / missing authorization / policy)",
+			"127.0.0.2": "Listed in SBL (Spamhaus Block List)",
+		},
+	},
+	"sbl.dq.spamhaus.net": {
+		name: "Spamhaus DQS (SBL)",
+		delistUrl: "https://check.spamhaus.org/",
+		mappings: {
+			"127.255.255.254":
+				"Query blocked by Spamhaus (rate limit / missing authorization / policy)",
 			"127.0.0.2": "Listed in SBL (Spamhaus Block List)",
 		},
 	},
@@ -246,13 +284,14 @@ export const blacklists = {
 			"127.0.0.2": "Listed in Pedantic.org",
 		},
 	},
-	"swinog.spam.dnsbl.ch": {
-		name: "Swinog DNSBL",
-		delistUrl: "https://www.swinog.ch/spam/",
-		mappings: {
-			"127.0.0.2": "Listed in Swinog",
-		},
-	},
+	// Disabled as Swinog DNSBL is not stable/reliable
+	//"swinog.spam.dnsbl.ch": {
+	//	name: "Swinog DNSBL",
+	//	delistUrl: "https://www.swinog.ch/spam/",
+	//	mappings: {
+	//		"127.0.0.2": "Listed in Swinog",
+	//	},
+	//},
 	"truncate.gbudb.net": {
 		name: "GBUdb Truncate",
 		delistUrl: "http://www.gbudb.com/truncate/",
@@ -295,13 +334,14 @@ export const blacklists = {
 			"127.0.0.2": "Listed in Abuse.ch Drone",
 		},
 	},
-	"orvedb.aupads.org": {
-		name: "OrveDB AuBads",
-		delistUrl: "https://aupads.org",
-		mappings: {
-			"127.0.0.2": "Listed in OrveDB",
-		},
-	},
+	// Dead project
+	//"orvedb.aupads.org": {
+	//	name: "OrveDB AuBads",
+	//	delistUrl: "https://aupads.org",
+	//	mappings: {
+	//		"127.0.0.2": "Listed in OrveDB",
+	//	},
+	//},
 	"rbl.0spam.org": {
 		name: "0spam RBL",
 		delistUrl: "https://0spam.org",
@@ -344,13 +384,14 @@ export const blacklists = {
 			"127.0.0.2": "Listed in Woody's",
 		},
 	},
-	"db.wpbl.info": {
-		name: "WPBL",
-		delistUrl: "http://wpbl.info",
-		mappings: {
-			"127.0.0.2": "Listed in WPBL",
-		},
-	},
+	// Often overloaded/unreliable
+	// "db.wpbl.info": {
+	// 	name: "WPBL",
+	// 	delistUrl: "http://wpbl.info",
+	// 	mappings: {
+	// 		"127.0.0.2": "Listed in WPBL",
+	// 	},
+	// },
 	"dnsbl-3.uceprotect.net": {
 		name: "UCEPROTECT Level 3",
 		delistUrl: "http://www.uceprotect.net/en/rblcheck.php",
@@ -358,13 +399,14 @@ export const blacklists = {
 			"127.0.0.2": "Listed in UCEPROTECT Level 3",
 		},
 	},
-	"duinv.aupads.org": {
-		name: "Duinv AuPads",
-		delistUrl: "https://aupads.org",
-		mappings: {
-			"127.0.0.2": "Listed in Duinv",
-		},
-	},
+	// Dead project
+	// "duinv.aupads.org": {
+	// 	name: "Duinv AuPads",
+	// 	delistUrl: "https://aupads.org",
+	// 	mappings: {
+	// 		"127.0.0.2": "Listed in Duinv",
+	// 	},
+	// },
 	"proxy.bl.gweep.ca": {
 		name: "Gweep Proxy",
 		delistUrl: "http://gweep.ca",

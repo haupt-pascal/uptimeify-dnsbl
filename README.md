@@ -26,9 +26,9 @@ We intentionally **do not** perform the DNS lookups internally. This allows you 
 We maintain definitions for the most reliable and widely used lists:
 
 - **Spamhaus ZEN** (SBL, CSS, XBL, PBL) - _The gold standard_
+- **Spamhaus DQS (ZEN)** - Same result parsing, but query via Spamhaus DQS (requires a DQS key)
 - **Barracuda** (BRBL)
 - **SpamCop**
-- **Abusix Mail Intelligence**
 - **SORBS** (Aggregate)
 - **UCEPROTECT** (Level 1)
 - **Hostkarma**
@@ -38,7 +38,6 @@ We maintain definitions for the most reliable and widely used lists:
 - **DroneBL**
 - **Spam Eating Monkey** (SEM-BLACK)
 - **URIBL Black**
-- **Madavi DNSBL**
 - **RV-SOFT Technology**
 - **ZapBL**
 - **Suomispam Reputation**
@@ -52,7 +51,6 @@ We maintain definitions for the most reliable and widely used lists:
 - **Abuse.ch Combined**
 - **UCEPROTECT Level 2**
 - **Abuse.ch Drone**
-- **OrveDB AuBads**
 - **0spam RBL**
 - **Singular TTK PTE**
 - **SpamRats Spam**
@@ -61,7 +59,6 @@ We maintain definitions for the most reliable and widely used lists:
 - **Woody's SMTP Blacklist**
 - **WPBL**
 - **UCEPROTECT Level 3**
-- **Duinv AuPads**
 - **Gweep Proxy**
 - **Gweep Relays**
 - **Abuse.ch Spam**
@@ -77,7 +74,6 @@ We maintain definitions for the most reliable and widely used lists:
 - **Mailspike Z**
 - **Anonmails.de**
 - **Pedantic.org**
-- **Swinog**
 - **GBUdb Truncate**
 - **LashBack UBL**
 
@@ -97,8 +93,15 @@ import { resolve4 } from "node:dns/promises";
 
 async function check(ip) {
 	// 1. Get the list of domains to query
-	const checks = getLookupDomains(ip);
+	const checks = getLookupDomains(ip, {
+		spamhaus: {
+			// Default: "zen" (public). Use "dqs" to query Spamhaus via DQS.
+			mode: process.env.SPAMHAUS_DQS_KEY ? "dqs" : "zen",
+			dqsKey: process.env.SPAMHAUS_DQS_KEY,
+		},
+	});
 	// Returns array: [{ address: "4.3.2.1.zen.spamhaus.org", listKey: "zen.spamhaus.org" }, ...]
+	// Or with DQS:   [{ address: "4.3.2.1.<DQS_KEY>.zen.dq.spamhaus.net", listKey: "zen.dq.spamhaus.net" }, ...]
 
 	// 2. Run your DNS lookups
 	// We use typical Promise handling here, but you can use any async pattern
@@ -133,9 +136,27 @@ check("127.0.0.2");
 
 ## API
 
-### `getLookupDomains(ip)`
+### `getLookupDomains(ip, options?)`
 
 Returns an array of objects containing the fully qualified domain to query (`address`) and the identifier key (`listKey`).
+
+#### Spamhaus DQS
+
+You can switch Spamhaus from the public DNSBL hostnames to Spamhaus DQS by passing an options object.
+
+```js
+const checks = getLookupDomains("1.2.3.4", {
+	spamhaus: {
+		mode: "dqs",
+		dqsKey: process.env.SPAMHAUS_DQS_KEY,
+	},
+});
+```
+
+Notes:
+
+- When `mode: "dqs"` is set, this library will generate DQS lookup domains for Spamhaus (and will not query the public Spamhaus DNSBL hostnames).
+- Keep the DQS key secret (don’t commit it to git or log it).
 
 ### `parseLookupResult(listKey, resultCode)`
 

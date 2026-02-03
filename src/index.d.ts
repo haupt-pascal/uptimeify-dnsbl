@@ -27,6 +27,15 @@ export interface BlacklistDefinition {
 	mappings: Record<string, string>;
 }
 
+export interface GetLookupDomainsOptions {
+	spamhaus?: {
+		/** Use Spamhaus public DNSBLs (zen) or Spamhaus DQS (dqs). Default: zen */
+		mode?: "zen" | "dqs";
+		/** Required when mode is 'dqs' */
+		dqsKey?: string;
+	};
+}
+
 /**
  * Definition of known blacklists and their return codes.
  */
@@ -39,6 +48,14 @@ export const blacklists: Record<string, BlacklistDefinition>;
  * @returns List of domains to query.
  */
 export function getLookupDomains(ip: string): LookupDomain[];
+
+/**
+ * Generates the list of domains to query, with optional Spamhaus DQS support.
+ */
+export function getLookupDomains(
+	ip: string,
+	options?: GetLookupDomainsOptions,
+): LookupDomain[];
 
 /**
  * Parses the result from a DNS A-record lookup.

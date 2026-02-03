@@ -67,9 +67,13 @@ function reverseIP(ip) {
  * Generates the list of domains to query.
  *
  * @param {string} ip - The IPv4 or IPv6 address to check.
+ * @param {Object} [options]
+ * @param {Object} [options.spamhaus]
+ * @param {"zen"|"dqs"} [options.spamhaus.mode] - Use Spamhaus public DNSBLs (zen) or Spamhaus DQS (dqs).
+ * @param {string} [options.spamhaus.dqsKey] - Required when mode is 'dqs'.
  * @returns {Array<LookupDomain>} List of domains to query.
  */
-export function getLookupDomains(ip) {
+export function getLookupDomains(ip, options = undefined) {
 	if (!ip || typeof ip !== "string") {
 		throw new Error("IP address must be a non-empty string");
 	}
@@ -79,10 +83,50 @@ export function getLookupDomains(ip) {
 		throw new Error(`Invalid IP address: ${ip}`);
 	}
 
-	return Object.keys(blacklists).map((listKey) => {
+	const spamhausMode = options?.spamhaus?.mode || "zen";
+	const dqsKeyRaw = options?.spamhaus?.dqsKey;
+	const dqsKey = typeof dqsKeyRaw === "string" ? dqsKeyRaw.trim() : "";
+
+	if (spamhausMode !== "zen" && spamhausMode !== "dqs") {
+		throw new Error("options.spamhaus.mode must be either 'zen' or 'dqs'");
+	}
+
+	if (spamhausMode === "dqs") {
+		if (!dqsKey) {
+			throw new Error(
+				"options.spamhaus.dqsKey is required when options.spamhaus.mode is 'dqs'",
+			);
+		}
+		// DQS keys are used as a DNS label; reject dots/whitespace and other characters.
+		if (!/^[a-z0-9-]+$/i.test(dqsKey)) {
+			throw new Error(
+				"options.spamhaus.dqsKey must be a valid DNS label (letters/numbers/hyphen)",
+			);
+		}
+	}
+
+	const spamhausPublicKeys = new Set(["zen.spamhaus.org", "sbl.spamhaus.org"]);
+	const spamhausDqsKeys = new Set(["zen.dq.spamhaus.net", "sbl.dq.spamhaus.net"]);
+
+	const listKeys = Object.keys(blacklists).filter((listKey) => {
+		if (spamhausMode === "zen") {
+			return !spamhausDqsKeys.has(listKey);
+		}
+		if (spamhausMode === "dqs") {
+			return !spamhausPublicKeys.has(listKey);
+		}
+		return true;
+	});
+
+	return listKeys.map((listKey) => {
+		const address =
+			spamhausMode === "dqs" && spamhausDqsKeys.has(listKey)
+				? `${reversed}.${dqsKey}.${listKey}`
+				: `${reversed}.${listKey}`;
+
 		return {
-			address: `${reversed}.${listKey}`,
-			listKey: listKey,
+			address,
+			listKey,
 		};
 	});
 }
@@ -119,6 +163,41 @@ export function parseLookupResult(listKey, resultCode) {
 	}
 
 	try {
+		// Some lists use A-record responses to indicate query errors/blocks.
+		// Treat these as NOT listed, otherwise they become false positives.
+		const spamhausKeys = new Set([
+			"zen.spamhaus.org",
+			"sbl.spamhaus.org",
+			"zen.dq.spamhaus.net",
+			"sbl.dq.spamhaus.net",
+		]);
+		if (spamhausKeys.has(listKey) && resultCode === "127.255.255.254") {
+			return {
+				name: listDef.name,
+				listed: false,
+				reason:
+					listDef.mappings?.[resultCode] ||
+					"Query blocked by Spamhaus (rate limit / missing authorization / policy)",
+				code: resultCode,
+				delistUrl: listDef.delistUrl,
+			};
+		}
+
+		if (
+			listKey === "black.uribl.com" &&
+			(resultCode === "127.0.0.1" || resultCode === "127.0.0.255")
+		) {
+			return {
+				name: listDef.name,
+				listed: false,
+				reason:
+					listDef.mappings?.[resultCode] ||
+					"Query blocked by URIBL (possibly due to high volume)",
+				code: resultCode,
+				delistUrl: listDef.delistUrl,
+			};
+		}
+
 		if (listKey === "nodes.junkemailfilter.com" && resultCode === "127.0.0.1") {
 			return {
 				name: listDef.name,
@@ -129,7 +208,9 @@ export function parseLookupResult(listKey, resultCode) {
 			};
 		}
 
-		const reason = listDef.mappings?.[resultCode] || "Listed (Unknown Reason)";
+		const reason =
+			listDef.mappings?.[resultCode] ||
+			`Listed (Unmapped return code: ${resultCode})`;
 
 		return {
 			name: listDef.name,

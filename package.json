@@ -1,6 +1,6 @@
 {
 	"name": "uptimeify-dnsbl",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "Helper module to prepare DNSBL queries and parse results.",
 	"main": "src/index.js",
 	"types": "src/index.d.ts",
