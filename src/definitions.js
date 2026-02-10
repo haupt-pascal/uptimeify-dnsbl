@@ -392,13 +392,15 @@ export const blacklists = {
 	// 		"127.0.0.2": "Listed in WPBL",
 	// 	},
 	// },
-	"dnsbl-3.uceprotect.net": {
-		name: "UCEPROTECT Level 3",
-		delistUrl: "http://www.uceprotect.net/en/rblcheck.php",
-		mappings: {
-			"127.0.0.2": "Listed in UCEPROTECT Level 3",
-		},
-	},
+
+	// Disabled as Spam404 is not stable/reliable
+	//"dnsbl-3.uceprotect.net": {
+	//	name: "UCEPROTECT Level 3",
+	//	delistUrl: "http://www.uceprotect.net/en/rblcheck.php",
+	//	mappings: {
+	//		"127.0.0.2": "Listed in UCEPROTECT Level 3",
+	//	},
+	//},
 	// Dead project
 	// "duinv.aupads.org": {
 	// 	name: "Duinv AuPads",

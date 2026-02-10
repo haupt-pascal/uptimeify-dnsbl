@@ -58,7 +58,6 @@ We maintain definitions for the most reliable and widely used lists:
 - **Virus RBL JP**
 - **Woody's SMTP Blacklist**
 - **WPBL**
-- **UCEPROTECT Level 3**
 - **Gweep Proxy**
 - **Gweep Relays**
 - **Abuse.ch Spam**
